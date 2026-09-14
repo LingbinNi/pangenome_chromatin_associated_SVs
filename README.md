@@ -15,402 +15,140 @@ Lingbin Ni *et al.*
 
 Genetic variation can alter the linear organization of the genome and, consequently, the interpretation of chromatin contacts when sequencing data are analyzed against a single reference genome. In this study, we use donor-specific, haplotype-resolved genome assemblies together with population-scale chromatin contact maps to characterize structural variation associated with recurrent changes in three-dimensional genome organization.
 
-The analyses implemented in this repository include:
+## Repository organization
 
-* haplotype-resolved mapping of chromatin contact data to donor-specific assemblies;
-* comparison of chromatin contacts obtained from donor-specific and reference-based mappings;
-* quantification of haplotype-specific chromatin contact divergence;
-* identification of **contact divergence hotspots (CDHs)**;
-* association of structural variants with recurrent CDHs;
-* identification of **chromatin-structure-associated structural variants (CSA-SVs)**;
-* integration of CSA-SVs with chromatin features and gene-expression variation;
-* evolutionary analyses of human-derived CSA-SVs;
-* selected genotype–phenotype association analyses; and
-* generation of figures and summary statistics reported in the manuscript.
-
-The primary human dataset comprises haplotype-resolved genome assemblies and chromatin contact maps from the Human Pangenome Reference Consortium (HPRC).
-
----
-
-## Analysis workflow
-
-The overall analysis framework is:
-
-```text
-Chromatin contact sequencing
-        │
-        ▼
-Donor-specific / haplotype-resolved mapping
-        │
-        ▼
-Contact filtering and coordinate comparison
-        │
-        ▼
-Haplotype-specific contact quantification
-        │
-        ▼
-Contact divergence hotspot (CDH) detection
-        │
-        ▼
-Structural variant association
-        │
-        ▼
-Chromatin-structure-associated SVs (CSA-SVs)
-        │
-        ├── Chromatin architecture
-        ├── Gene expression
-        ├── Evolutionary analyses
-        └── Phenotypic associations
-```
-
----
-
-## Repository structure
+The code is organized according to the major analytical stages of the study. Rather than representing a single end-to-end software pipeline, each directory contains scripts used for a specific component of the analyses described in the manuscript.
 
 ```text
 pangenome_chromatin_associated_SVs/
 │
-├── README.md
-├── LICENSE
-├── CITATION.cff
-├── environment.yml
+├── hic_processing/
+├── contact_matrix/
 │
-├── config/
-│   └── example_config.yaml
+├── mapping_difference_analysis/
+├── mapping_shift_analysis/
+├── mapping_structure_analysis/
+├── chromatin_structure/
 │
-├── scripts/
-│   │
-│   ├── 01_mapping/
-│   │   └── Scripts for reference- and donor-specific mapping
-│   │
-│   ├── 02_contact_comparison/
-│   │   └── Comparison of contact coordinates and mapping contexts
-│   │
-│   ├── 03_haplotype_contacts/
-│   │   └── Identification and quantification of haplotype-specific contacts
-│   │
-│   ├── 04_CDH_detection/
-│   │   └── Statistical detection and characterization of CDHs
-│   │
-│   ├── 05_SV_association/
-│   │   └── Association analyses between structural variants and CDHs
-│   │
-│   ├── 06_expression/
-│   │   └── Integration of CSA-SV genotypes with gene expression
-│   │
-│   ├── 07_evolution/
-│   │   └── Evolutionary and comparative genomic analyses
-│   │
-│   ├── 08_PheWAS/
-│   │   └── Selected phenotype association analyses
-│   │
-│   └── 09_figures/
-│       └── Scripts used to generate manuscript figures
+├── contact_difference_hotspot_identification/
+├── contact_difference_hotspot_contact/
+├── contact_difference_hotspot_analysis/
 │
-├── example/
-│   ├── input/
-│   └── expected_output/
+├── structure_associated_SV_panCDH/
+├── structure_associated_SV_identification/
+├── structure_associated_SV_feature/
 │
-└── docs/
-    └── workflow.md
+├── expression_analysis_mapping/
+├── expression_analysis_integration/
+├── expression_analysis_pattern/
+├── expression_analysis_correlation/
+│
+├── evolution_analysis_mapping/
+├── evolution_analysis_feature/
+│
+└── README.md
 ```
 
-The exact directory organization may evolve during manuscript revision. The version associated with the published manuscript will be archived as a fixed release.
+For clarity, these directories can be grouped into five major analysis stages corresponding to the progression of the manuscript.
 
 ---
 
-## Major analysis modules
+## Analysis modules
 
-### 1. Donor-specific chromatin contact mapping
+### 1. Hi-C processing and reference-dependent mapping analyses
 
-Chromatin contact sequencing reads are mapped independently to the two haplotype-resolved assemblies of each donor and, where appropriate, to the T2T-CHM13 reference genome.
+These scripts process chromatin contact data and evaluate how the choice of genome representation influences contact mapping and inferred chromatin organization.
 
-This module contains scripts for:
+| Directory                      | Description                                                                                                    |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| `hic_processing/`              | Processing of Hi-C/Omni-C sequencing data and generation of filtered chromatin contact pairs.                  |
+| `contact_matrix/`              | Generation and processing of chromatin contact matrices used for downstream analyses.                          |
+| `mapping_difference_analysis/` | Comparison of chromatin contacts obtained from donor-specific assemblies and the shared reference genome.      |
+| `mapping_shift_analysis/`      | Quantification of changes in inferred genomic positions and contact distances between mapping contexts.        |
+| `mapping_structure_analysis/`  | Evaluation of mapping-dependent differences in higher-order chromatin organization.                            |
+| `chromatin_structure/`         | Identification and analysis of chromatin structural features, including domain boundaries and chromatin loops. |
 
-* read mapping;
-* contact-pair parsing and filtering;
-* haplotype-specific contact assignment;
-* generation of contact matrices; and
-* comparison between donor-specific and reference-based mappings.
-
-Relevant directory:
-
-```text
-scripts/01_mapping/
-```
+Together, these analyses evaluate the extent to which a shared linear reference preserves chromatin contact identity while altering the genomic coordinates or inferred separation of interacting loci.
 
 ---
 
-### 2. Reference-dependent contact differences
+### 2. Identification and characterization of contact divergence hotspots
 
-Contacts detected using donor-specific assemblies are compared with those obtained after mapping the same sequencing data to a common reference genome.
+These scripts identify genomic regions showing recurrent excesses of haplotype-specific chromatin contacts and characterize their properties across the population.
 
-These analyses quantify:
+| Directory                                    | Description                                                                                                      |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `contact_difference_hotspot_identification/` | Statistical identification of contact divergence hotspots (CDHs) from haplotype-resolved chromatin contact maps. |
+| `contact_difference_hotspot_contact/`        | Contact-level analyses of shared and haplotype-specific interactions associated with CDHs.                       |
+| `contact_difference_hotspot_analysis/`       | Population-level characterization, recurrence analysis, and genomic annotation of CDHs.                          |
 
-* recovery of valid contact pairs;
-* changes in inferred genomic distance;
-* local mapping-dependent contact differences; and
-* differences in loop calls between mapping contexts.
-
-Relevant directory:
-
-```text
-scripts/02_contact_comparison/
-```
+CDHs are defined as genomic regions with an excess of haplotype-specific chromatin contacts relative to the local background expectation. These analyses establish the population-scale distribution and recurrence of chromatin contact divergence.
 
 ---
 
-### 3. Haplotype-specific chromatin contacts
+### 3. Identification of chromatin-structure-associated structural variants
 
-Haplotype-resolved contact maps are used to quantify chromatin interactions preferentially supported by one haplotype.
+These scripts integrate recurrent CDHs with haplotype-resolved structural variation to identify structural variants associated with chromatin contact divergence.
 
-Relevant directory:
+| Directory                                 | Description                                                                                 |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `structure_associated_SV_panCDH/`         | Integration of structural variants with recurrent population-level CDH regions.             |
+| `structure_associated_SV_identification/` | Statistical identification of chromatin-structure-associated structural variants (CSA-SVs). |
+| `structure_associated_SV_feature/`        | Genomic and regulatory characterization of identified CSA-SVs.                              |
 
-```text
-scripts/03_haplotype_contacts/
-```
-
-This module includes procedures for:
-
-* identifying shared and haplotype-specific contacts;
-* filtering contacts by mapping quality and genomic distance;
-* summarizing haplotype-specific contact density; and
-* evaluating potential mapping ambiguity.
+These analyses prioritize a subset of structural variants whose genotypes are associated with recurrent chromatin contact divergence across individuals.
 
 ---
 
-### 4. Contact divergence hotspots
+### 4. Integration with gene-expression variation
 
-**Contact divergence hotspots (CDHs)** are genomic regions showing an excess of haplotype-specific chromatin contacts relative to the local background expectation.
+These scripts integrate CSA-SV genotypes and chromatin organization with matched transcriptomic data.
 
-CDH detection accounts for the relationship between shared and haplotype-specific contact coverage and for coverage-dependent variability.
+| Directory                          | Description                                                                                     |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `expression_analysis_mapping/`     | Processing and mapping of matched transcriptomic data for haplotype-aware expression analyses.  |
+| `expression_analysis_integration/` | Integration of CSA-SV genotypes with gene-expression measurements and cis-association analyses. |
+| `expression_analysis_pattern/`     | Characterization of genotype-dependent and allele-dosage-associated expression patterns.        |
+| `expression_analysis_correlation/` | Correlation analyses between local chromatin organization and gene expression.                  |
 
-Relevant directory:
-
-```text
-scripts/04_CDH_detection/
-```
-
-The statistical framework includes:
-
-* coverage-aware modeling of expected haplotype-specific contact counts;
-* estimation of coverage-dependent dispersion;
-* upper-tail statistical testing;
-* multiple-testing correction; and
-* merging and characterization of significant windows.
-
-See the manuscript Methods for the complete statistical definition and filtering criteria.
+These analyses evaluate whether structural variants associated with recurrent chromatin contact divergence are also associated with variation in nearby gene expression.
 
 ---
 
-### 5. Structural variant association and CSA-SVs
+### 5. Evolutionary analysis of CSA-SVs
 
-Structural variants overlapping or occurring near recurrent CDHs are tested for association with chromatin contact divergence across individuals and haplotypes.
+These scripts use comparative genomic information to investigate the evolutionary origin and genomic properties of CSA-SVs.
 
-Variants satisfying the predefined statistical and recurrence criteria are referred to as:
+| Directory                     | Description                                                                                                |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `evolution_analysis_mapping/` | Comparative mapping and inference of structural-variant states across human and non-human primate genomes. |
+| `evolution_analysis_feature/` | Characterization of the evolutionary origins and genomic features of CSA-SVs.                              |
 
-> **chromatin-structure-associated structural variants (CSA-SVs)**
-
-Relevant directory:
-
-```text
-scripts/05_SV_association/
-```
-
-This module includes:
-
-* SV–CDH overlap analyses;
-* enrichment analyses;
-* genotype–chromatin association testing;
-* permutation procedures;
-* recurrence filtering; and
-* CSA-SV annotation.
+These analyses distinguish human-derived from ancestral structural variants and evaluate the evolutionary properties of structural variants associated with chromatin contact divergence.
 
 ---
 
-### 6. Gene-expression integration
+## Relationship to manuscript analyses
 
-CSA-SV genotypes are integrated with matched transcriptomic data to identify loci associated with gene-expression differences.
+The code organization broadly follows the order of the major analyses presented in the manuscript:
 
-Relevant directory:
+| Manuscript analysis                                           | Relevant directories                                                                                                                                   |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Haplotype-resolved mapping and reference-dependent distortion | `hic_processing/`, `contact_matrix/`, `mapping_difference_analysis/`, `mapping_shift_analysis/`, `mapping_structure_analysis/`, `chromatin_structure/` |
+| Identification of recurrent chromatin contact divergence      | `contact_difference_hotspot_identification/`, `contact_difference_hotspot_contact/`, `contact_difference_hotspot_analysis/`                            |
+| Identification and characterization of CSA-SVs                | `structure_associated_SV_panCDH/`, `structure_associated_SV_identification/`, `structure_associated_SV_feature/`                                       |
+| CSA-SVs and gene-expression variation                         | `expression_analysis_mapping/`, `expression_analysis_integration/`, `expression_analysis_pattern/`, `expression_analysis_correlation/`                 |
+| Evolutionary analysis of CSA-SVs                              | `evolution_analysis_mapping/`, `evolution_analysis_feature/`                                                                                           |
 
-```text
-scripts/06_expression/
-```
-
-Analyses include:
-
-* genotype–expression association testing;
-* expression dosage-pattern classification;
-* chromatin–expression correlation analyses; and
-* locus-level visualization.
+Individual scripts within each directory correspond to specific analyses, summary statistics, and visualizations described in the Methods and figure legends of the manuscript.
 
 ---
 
-### 7. Evolutionary analyses
+## Scope of the repository
 
-Comparative genomic analyses are used to infer the evolutionary origin of selected CSA-SVs and evaluate chromatin divergence at orthologous loci across humans and non-human primates.
+This repository contains the custom analysis code developed for this study. It is intended to document and reproduce the principal computational analyses rather than provide a standalone software package.
 
-Relevant directory:
-
-```text
-scripts/07_evolution/
-```
-
----
-
-### 8. Phenotype association analyses
-
-Selected CSA-SVs were evaluated for associations with human phenotypes using population-scale genotype and phenotype data.
-
-Relevant directory:
-
-```text
-scripts/08_PheWAS/
-```
-
-Because some analyses use controlled-access datasets, individual-level genotype and phenotype data are **not distributed through this repository**.
-
----
-
-## Software and computational environment
-
-Analyses were performed using a combination of Python, R, shell scripts, and established genomics software.
-
-Major dependencies include:
-
-```text
-Python
-R
-BWA
-SAMtools
-BCFtools
-BEDTools
-pairtools
-cooler
-cooltools
-HiCExplorer
-PLINK2
-```
-
-Exact software versions used for the manuscript analyses are documented in:
-
-```text
-environment.yml
-```
-
-and/or within the corresponding analysis directories.
-
-To create the Conda environment:
-
-```bash
-conda env create -f environment.yml
-conda activate pangenome-chromatin-sv
-```
-
-Some analyses require additional software or high-performance computing resources that are not distributed through Conda. These dependencies are described in the relevant scripts or documentation.
-
----
-
-## Usage
-
-Most scripts are designed to operate on preprocessed genomic files and accept input/output paths as command-line arguments.
-
-A typical analysis can be executed as:
-
-```bash
-python scripts/<analysis_module>/<script>.py \
-    --input <input_file> \
-    --output <output_file>
-```
-
-or:
-
-```bash
-Rscript scripts/<analysis_module>/<script>.R \
-    <input_file> \
-    <output_file>
-```
-
-Scripts requiring cohort-scale processing may additionally require configuration files describing sample names, genome assemblies, reference files, or computational resources.
-
-Example configurations are provided in:
-
-```text
-config/
-```
-
----
-
-## Example data
-
-Because the complete study involves large-scale chromatin contact datasets and hundreds of haplotype-resolved genome assemblies, the full analysis cannot be reproduced using data stored directly in this GitHub repository.
-
-Where feasible, small example inputs and expected outputs are provided in:
-
-```text
-example/
-```
-
-These files are intended to illustrate input formats and allow key custom scripts to be tested without downloading the full study dataset.
-
----
-
-## Reproducing manuscript analyses
-
-The relationship between major manuscript analyses and code modules is summarized below.
-
-| Manuscript analysis                     | Code                             |
-| --------------------------------------- | -------------------------------- |
-| Donor-specific mapping                  | `scripts/01_mapping/`            |
-| Reference-dependent contact differences | `scripts/02_contact_comparison/` |
-| Haplotype-specific contacts             | `scripts/03_haplotype_contacts/` |
-| CDH identification                      | `scripts/04_CDH_detection/`      |
-| SV enrichment and CSA-SV discovery      | `scripts/05_SV_association/`     |
-| CSA-SV–expression analyses              | `scripts/06_expression/`         |
-| Evolutionary analyses                   | `scripts/07_evolution/`          |
-| Phenome-wide association analyses       | `scripts/08_PheWAS/`             |
-| Figure generation                       | `scripts/09_figures/`            |
-
-Additional script-to-figure mappings will be provided with the final manuscript release.
-
----
-
-## Data availability
-
-The analyses in this study integrate publicly available and controlled-access genomic datasets.
-
-Large genomic datasets, including raw chromatin contact sequencing data, genome assemblies, contact matrices, and controlled-access genotype/phenotype data, are not stored directly in this repository.
-
-Data-access information and accession identifiers are described in the **Data availability** section of the manuscript.
-
-Relevant resources include:
-
-* Human Pangenome Reference Consortium datasets;
-* donor-specific haplotype-resolved genome assemblies;
-* matched chromatin contact datasets;
-* matched transcriptomic datasets; and
-* controlled-access population-scale genotype and phenotype datasets used for selected association analyses.
-
-Users are responsible for obtaining any required data-access approvals before reproducing analyses involving controlled-access datasets.
-
----
-
-## Reproducibility
-
-The repository is intended to provide the custom computational procedures required to reproduce the principal analyses reported in the manuscript.
-
-For reproducibility:
-
-1. custom analysis scripts are organized according to the scientific workflow;
-2. command-line parameters and input/output formats are documented where applicable;
-3. software versions are recorded;
-4. small example datasets are provided when redistribution is permitted; and
-5. the code corresponding to the published manuscript will be archived as a versioned release.
-
-The complete cohort-scale analyses require substantial computational resources and access to the source genomic datasets and therefore are not intended to run directly from this repository as a single end-to-end workflow.
-
----
+The complete cohort-scale analyses require access to the corresponding genomic datasets, donor-specific assemblies, chromatin contact data, transcriptomic data, and substantial computational resources. Large genomic input files and intermediate results are therefore not distributed through this repository.
 
 ## Versioning
 
