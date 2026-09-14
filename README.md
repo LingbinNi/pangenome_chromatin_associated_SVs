@@ -195,8 +195,3 @@ For questions regarding the code or analyses, please open a GitHub issue or cont
 University of Washington
 Eichler Laboratory
 
----
-
-## Disclaimer
-
-This repository contains research code developed for the analyses described in the accompanying manuscript. It is provided primarily to support transparency and reproducibility of the published work and should not be interpreted as a production software package.
