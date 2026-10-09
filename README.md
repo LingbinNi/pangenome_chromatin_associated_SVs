@@ -10,6 +10,9 @@ Lingbin Ni, Jiadong Lin, DongAhn Yoo, Taralynn Mack, Isaac Wong, Julie Wertz, Ka
 > **Repository:** `pangenome_chromatin_associated_SVs`
 
 ---
+![Analysis workflow](images/workflow.png)
+
+---
 
 ## Overview
 
