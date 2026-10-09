@@ -11,12 +11,6 @@ Lingbin Ni, Jiadong Lin, DongAhn Yoo, Taralynn Mack, Isaac Wong, Julie Wertz, Ka
 
 ---
 
-## Graphical abstract
-
-![Analysis workflow](images/workflow.png)
-
----
-
 ## Overview
 
 Understanding how genetic variation contributes to differences in three-dimensional (3D) genome organization among humans has remained challenging, in part because chromatin interaction studies typically map genetically diverse individuals to a single reference genome. This framework can obscure haplotype-specific genome structure and make it difficult to distinguish technical effects of reference representation from genuine biological variation.
