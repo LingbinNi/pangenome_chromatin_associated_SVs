@@ -49,8 +49,9 @@ pairtools split --nproc-in 8 --nproc-out 8 --output-pairs '$filename'.mapped.pai
 samtools view -bS -@16 | samtools sort -@16 -T '$current_path'/'$sample'/'$filename'/temp/temp.bam -o '$filename'.mapped.PT.bam;
 
 bgzip -@ 16 dedup.dups.pairsam
-bgzip -@ 16 '$filenamebase'.mapped.pairs
+bgzip -@ 16 '$filename'.mapped.pairs
 ' > script.sh
+qsub script.sh
 
 cd ..
 done
